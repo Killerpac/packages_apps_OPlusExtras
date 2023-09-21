@@ -1,8 +1,18 @@
- /*
+/**
  * Copyright (C) 2016 The CyanogenMod project
  *               2017-2020 The LineageOS Project
- *               2022 The Evolution X Project
- * SPDX-License-Identifier: Apache-2.0
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 
 package org.evolution.oplus.OPlusExtras.touch;
@@ -35,8 +45,6 @@ import android.util.SparseIntArray;
 import android.view.KeyEvent;
 
 import com.android.internal.os.DeviceKeyHandler;
-
-import lineageos.providers.LineageSettings;
 
 public class KeyHandler implements DeviceKeyHandler {
 
@@ -220,7 +228,7 @@ public class KeyHandler implements DeviceKeyHandler {
                 case TouchscreenGestureConstants.ACTION_ALIPAY_SCAN:
                 case TouchscreenGestureConstants.ACTION_ALIPAY_TRIP:
                 case TouchscreenGestureConstants.ACTION_WALLET_TRIP:
-                case TouchscreenGestureConstants.ACTION_OPLUS_EXTRAS:
+                case TouchscreenGestureConstants.ACTION_DEVICE_EXTRAS:
                 case TouchscreenGestureConstants.ACTION_GOOGLE_MAPS:
                 case TouchscreenGestureConstants.ACTION_GOOGLE_SEARCH:
                     launchActivity(msg.arg1);
@@ -231,7 +239,7 @@ public class KeyHandler implements DeviceKeyHandler {
 
     private void launchCamera() {
         mGestureWakeLock.acquire(GESTURE_WAKELOCK_DURATION);
-        final Intent intent = new Intent(lineageos.content.Intent.ACTION_SCREEN_CAMERA_GESTURE);
+        final Intent intent = new Intent(android.content.Intent.ACTION_CAMERA_BUTTON);
         mContext.sendBroadcastAsUser(intent, UserHandle.CURRENT,
                 Manifest.permission.STATUS_BAR_SERVICE);
         doHapticFeedback();
@@ -319,13 +327,10 @@ public class KeyHandler implements DeviceKeyHandler {
             return;
         }
 
-        if (mAudioManager.getRingerMode() != AudioManager.RINGER_MODE_SILENT) {
-            final boolean enabled = LineageSettings.System.getInt(mContext.getContentResolver(),
-                    LineageSettings.System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, 1) != 0;
-            if (enabled) {
-                mVibrator.vibrate(VibrationEffect.createOneShot(50,
-                        VibrationEffect.DEFAULT_AMPLITUDE));
-            }
+        final boolean enabled = Settings.System.getInt(mContext.getContentResolver(),
+                Settings.System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, 1) != 0;
+        if (enabled) {
+            mVibrator.vibrate(VibrationEffect.get(VibrationEffect.EFFECT_CLICK));
         }
     }
 
