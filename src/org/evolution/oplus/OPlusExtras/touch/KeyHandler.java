@@ -239,17 +239,15 @@ public class KeyHandler implements DeviceKeyHandler {
 
     private void launchCamera() {
         mGestureWakeLock.acquire(GESTURE_WAKELOCK_DURATION);
-        final Intent intent = new Intent(android.content.Intent.ACTION_CAMERA_BUTTON);
+        final Intent intent = new Intent(android.content.Intent.ACTION_SCREEN_CAMERA_GESTURE);
         mContext.sendBroadcastAsUser(intent, UserHandle.CURRENT,
                 Manifest.permission.STATUS_BAR_SERVICE);
-        doHapticFeedback();
     }
 
     private void launchActivity(int action) {
         mGestureWakeLock.acquire(GESTURE_WAKELOCK_DURATION);
         mPowerManager.wakeUp(SystemClock.uptimeMillis(), GESTURE_WAKEUP_REASON);
         ActionUtils.triggerAction(mContext, action);
-        doHapticFeedback();
     }
 
     private void toggleFlashlight() {
@@ -262,35 +260,29 @@ public class KeyHandler implements DeviceKeyHandler {
             } catch (CameraAccessException e) {
                 // Ignore
             }
-            doHapticFeedback();
         }
     }
 
     private void playPauseMusic() {
         dispatchMediaKeyWithWakeLockToMediaSession(KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE);
-        doHapticFeedback();
     }
 
     private void previousTrack() {
         dispatchMediaKeyWithWakeLockToMediaSession(KeyEvent.KEYCODE_MEDIA_PREVIOUS);
-        doHapticFeedback();
     }
 
     private void nextTrack() {
         dispatchMediaKeyWithWakeLockToMediaSession(KeyEvent.KEYCODE_MEDIA_NEXT);
-        doHapticFeedback();
     }
 
     private void volumeDown() {
         mGestureWakeLock.acquire(GESTURE_WAKELOCK_DURATION);
         mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_LOWER, 0);
-        doHapticFeedback();
     }
 
     private void volumeUp() {
         mGestureWakeLock.acquire(GESTURE_WAKELOCK_DURATION);
         mAudioManager.adjustStreamVolume(AudioManager.STREAM_MUSIC, AudioManager.ADJUST_RAISE, 0);
-        doHapticFeedback();
     }
 
     private void launchDozePulse() {
@@ -322,17 +314,7 @@ public class KeyHandler implements DeviceKeyHandler {
     }
 
 
-    private void doHapticFeedback() {
-        if (mVibrator == null || !mVibrator.hasVibrator()) {
-            return;
-        }
 
-        final boolean enabled = Settings.System.getInt(mContext.getContentResolver(),
-                Settings.System.TOUCHSCREEN_GESTURE_HAPTIC_FEEDBACK, 1) != 0;
-        if (enabled) {
-            mVibrator.vibrate(VibrationEffect.get(VibrationEffect.EFFECT_CLICK));
-        }
-    }
 
     private String getRearCameraId() {
         if (mRearCameraId == null) {
